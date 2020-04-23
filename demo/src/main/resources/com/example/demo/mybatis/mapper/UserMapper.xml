@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.UserMapper">
+	<resultMap id="userMap" type="user">
+		<id column="userId" property="userId" javaType="String" />
+		<result column="userPassword" property="userPassword" javaType="String" />
+	</resultMap>
+	
+	<select id="select" resultMap="userMap">
+		SELECT	
+			a.userId 
+			, a.userEmailId 
+			, a.userType
+			, a.kakaoUserId 
+			, a.userName 
+			, a.gender
+			, a.birthDay 
+			, a.area
+			, a.termsYn
+			, a.pushYn
+			, a.pushKey
+			, a.imageUrl 
+			, a.registrationDate
+			, a.dropYn
+			, a.dropDate 
+			, a.dropReason 
+			, b.roleCode
+		FROM
+			USER a
+			LEFT OUTER JOIN USER_ROLES b ON a.userId = b.userId 
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="searchUserId != null and searchUserId != ''">
+				AND a.userId = #{searchUserId}
+			</if>
+			<if test="searchUserName != null and searchUserName != ''">
+				AND a.userName LIKE concat('%', #{searchUserName}, '%')
+			</if>
+			<if test="searchUserEmailId != null and searchUserEmailId != ''">
+				AND a.userEmailId LIKE concat('%', #{searchUserEmailId}, '%')
+			</if>
+			<if test="pushYn != null and pushYn != ''">
+				AND a.pushYn = #{pushYn}
+			</if>
+			<if test="termsYn != null and termsYn != ''">
+				AND a.termsYn = #{termsYn}
+			</if>
+			<if test="dropYn != null and dropYn != ''">
+				AND a.dropYn = #{dropYn}
+			</if>
+		</trim>
+		ORDER BY
+			<choose>
+				<when test="sort != null and sort == 'userId'">a.userId</when>
+				<otherwise>a.userId</otherwise>
+			</choose>
+			<choose>
+				<when test="order != null and order == 'asc'">ASC</when>
+				<otherwise>DESC</otherwise>
+			</choose>
+		LIMIT #{offset}, #{limit}
+	</select>
+	
+	<insert id="insert" parameterType="user">
+		INSERT INTO USER (
+			userEmailId
+			, kakaoUserId
+			, userType
+			<if test="userPassword != null and userPassword !='' ">
+	 		, userPassword
+	 		</if>
+	 		, userName
+	 		, gender
+	 		, birthDay
+	 		, area
+	 		, termsYn
+	 		, pushYn
+	 		, pushKey
+	 		, imageUrl
+	 		, registrationDate
+	 		, dropYn
+		) VALUES (
+			#{userEmailId}
+			, #{kakaoUserId}
+			, #{userType}
+			<if test="userPassword != null and userPassword !='' ">
+			, #{userPassword}
+			</if>
+			, #{userName}
+			, #{gender}
+			, #{birthDay}
+			, #{area}
+			, #{termsYn}
+			, #{pushYn}
+			, #{pushKey}
+			, #{imageUrl}
+			, NOW()
+			, 'N'
+		)
+		<selectKey resultType="Integer" keyProperty="userId" order="AFTER">
+        	SELECT LAST_INSERT_ID()
+    	</selectKey>
+	</insert>
+	
+	<update id="update" parameterType="user">
+		UPDATE USER
+		SET 
+			<if test="userEmailId != null and userEmailId !='' ">
+			userEmailId 		= #{userEmailId},
+			</if>
+			<if test="userType != null and userType !='' ">
+			userType 			= #{userType},
+			</if>
+			<if test="kakaoUserId != null and kakaoUserId !='' ">
+			kakaoUserId 		= #{kakaoUserId},
+			</if>
+	 		<if test="userName != null and userName !='' ">
+			userName 			= #{userName},
+			</if>
+	 		<if test="gender != null and gender !='' ">
+	 		gender				= #{gender},
+	 		</if>
+	 		birthDay			= #{birthDay},
+	 		<if test="area != null and area !='' ">
+	 		area				= #{area},
+	 		</if>
+	 		<if test="termsYn != null and termsYn !='' ">
+	 		termsYn				= #{termsYn},
+	 		</if>
+	 		<if test="pushYn != null and pushYn !='' ">
+	 		pushYn				= #{pushYn},
+	 		</if>
+	 		<if test="pushKey != null and pushKey !='' ">
+	 		pushKey				= #{pushKey},
+	 		</if>
+	 		<if test="imageUrl != null and imageUrl !='' ">
+	 		imageUrl			= #{imageUrl},
+	 		</if>
+	 		updateDate 			= NOW()
+		WHERE userId 			= #{userId}
+	</update>
+	
+	<update id="delete">
+		UPDATE USER 
+		SET
+			dropYn				= #{dropYn},
+			dropReason			= #{dropReason},
+			dropDate			= NOW(),
+			updateDate 			= NOW()
+		WHERE userId 			= #{userId}
+	</update>
+	
+	<update id="updatePassword" parameterType="user">
+		UPDATE USER
+		SET userPassword = #{userPassword}, updateDate = NOW()
+		WHERE userId = #{userId}
+	</update>
+	
+	<update id="forcedUpdatePassword" parameterType="user">
+		UPDATE USER
+		SET userPassword = #{userPassword}, updateDate = NOW()
+		WHERE userEmailId = #{userEmailId}
+	</update>
+	
+</mapper>

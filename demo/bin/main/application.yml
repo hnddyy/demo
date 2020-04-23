@@ -1,0 +1,40 @@
+mybatis:
+  config-location: classpath:com/example/demo/mybatis/mybatis-config.xml
+
+server:
+  address: 0.0.0.0
+  port: 8080
+  servlet:
+    session: 
+      timeout: 1800
+  compression:
+    enabled: true
+    excluded-user-agents: gozilla, traviata
+    mime-types: text/html,text/xml,text/css,text/javascript,application/javascript,application/x-javascript,image/gif,image/jpg,image/jpeg,image/png,text/x-component,image/svg+xml
+    min-response-size: 1024
+  undertow:
+    accesslog:
+      dir: ./logs/
+      rotate: true
+      pattern: combined
+      suffix: .log
+      enabled: false
+    
+spring:
+  h2:
+    console:
+      enabled: true  # H2 웹 콘솔을 사용하겠다는 의미
+      path: /h2-console  # 콘솔의 경로
+
+  datasource:
+    driver-class-name: org.h2.Driver  #h2 드라이버 설정
+    url: jdbc:h2:file:~/Develop/kakao/demo_db;AUTO_SERVER=TRUE  #접속 URL
+    username: demo  # 사용자 이름 (로그인 시 사용)
+    password: 1234  # 사용자 암호 (로그인 시 사용)
+  
+spring.http.encoding:
+  charset: UTF-8
+  enabled: true
+  force: true
+  force-request: true
+  force-response: true
