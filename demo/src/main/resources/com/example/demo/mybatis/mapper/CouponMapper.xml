@@ -4,7 +4,86 @@
 	<resultMap id="couponMap" type="coupon">
 		<id column="couponCode" property="userId" javaType="String" />
 		<result column="useYn" property="useYn" javaType="String" />
-		<result column="expireYn" property="expireYn" javaType="String" />
+		<result column="giveYn" property="giveYn" javaType="String" />
 		<result column="userId" property="userId" javaType="String" />
+		<result column="makeDate" property="makeDate" javaType="java.util.Date" />
+		<result column="expireDate" property="expireDate" javaType="String" />
+		<result column="expireAlarmYn" property="expireAlarmYn" javaType="String" />
 	</resultMap>
+	
+	<select id="select" resultMap="couponMap">
+		SELECT couponeCode
+				,useYn
+				,giveYn
+				,userId
+				,makeDate
+				,expireDate
+				,expireAlarmYn
+		FROM COUNPON
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="useYn != null and useYn != ''">
+				AND useYn = #{useYn}
+			</if>
+			<if test="giveYn != null and giveYn != ''">
+				AND giveYn = #{giveYn}
+			</if>
+			AND expireDate > TODAY()
+		</trim>
+		ORDER BY expireDate ASC limit 1
+	</select>
+	
+	<select id="selectList" resultMap="couponMap">
+		SELECT couponeCode
+				,useYn
+				,giveYn
+				,userId
+				,makeDate
+				,expireDate
+				,expireAlarmYn
+		FROM COUNPON
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="giveYn != null and giveYn != ''">
+				AND giveYn = #{giveYn}
+			</if>
+			<if test="expireDate != null and expireDate != ''">
+				AND expireDate = #{expireDate}
+			</if>
+		</trim>
+		ORDER BY expireDate ASC
+	</select>
+	
+	<insert id="insert" parameterType="coupon">
+		INSERT INTO COUNPON (
+			conponCode
+			,useYn
+			,giveYn
+			,makeDate
+			,expireDate
+			,expireAlarmYn
+		) VALUES (
+			,#{couponCode}
+			,'N'
+			,'N'
+			,NOW()
+			,#{expireDate}
+			,'N'
+		)
+	</insert>
+	
+	<update id="update" parameterType="coupon">
+		UPDATE COUPON
+		SET
+			<if test="useYn != null and useYn !='' ">
+			useYn 			= #{useYn},
+			</if>
+			<if test="giveYn != null and giveYn !='' ">
+			giveYn 			= #{giveYn},
+			</if>
+			<if test="expireAlarmYn != null and expireAlarmYn !='' ">
+			expireAlarmYn 	= #{expireAlarmYn},
+			</if>
+			userId 			= #{userId}
+		WHERE couponCode 	= #{couponCode}
+	</update>
+	
 </mapper>
