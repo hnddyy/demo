@@ -3,9 +3,12 @@ package com.example.demo.domain;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.ibatis.type.Alias;
+
 import lombok.Data;
 
 @Data
+@Alias("coupon")
 public class Coupon	implements Serializable {
 
 	/**
@@ -16,8 +19,6 @@ public class Coupon	implements Serializable {
 	String couponCode;
 	
 	String useYn;
-	
-	//String expireYn; 이거 넣으면 스케줄링에서 처리해야
 	
 	// 지급 여부
 	String giveYn;

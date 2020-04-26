@@ -1,10 +1,11 @@
 package com.example.demo.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,19 +30,23 @@ public class CouponController {
 	 * N개 쿠폰 발급
 	 * input : N
 	 */
-	@PostMapping("/make")
+	@GetMapping("/make")
 	public String makeCounpons(@RequestParam(required = true) Integer N) {
-		String returnMessage = "";
+		String returnMessage = "makeCounpons";
+
+		couponService.makeCoupons(N);
+		
 		return returnMessage;
 	}
-	
+
 	/**
 	 * 쿠폰 하나 지급
 	 * output : 쿠폰 번호  
 	 */
 	@GetMapping("/get")
 	public String getCounponCode() {
-		String couponCode = "";
+		String couponCode = couponService.select("N","N");
+		System.err.println(couponCode);
 		return couponCode;
 	}
 	
@@ -51,7 +56,11 @@ public class CouponController {
 	 */
 	@GetMapping("/get/list")
 	public List<Coupon> getCouponList() {
-		return null;
+		SimpleDateFormat format = new SimpleDateFormat ( "yyyy-MM-dd");
+		Date date = new Date();
+		String todayDate = format.format(date);
+		List<Coupon> list = couponService.selectList("Y", todayDate, "N");
+		return list;
 	}
 	
 	/**
@@ -60,7 +69,11 @@ public class CouponController {
 	 */
 	@PutMapping("/use")
 	public String usedCoupon(@RequestParam(required = true) String couponCode) {
-		String returnMessage = "";
+		String returnMessage = "usedCoupon";
+		Coupon coupon = new Coupon();
+		coupon.setCouponCode(couponCode);
+		coupon.setUseYn("Y");
+		couponService.update(coupon);
 		return returnMessage;
 	}
 	
@@ -71,6 +84,10 @@ public class CouponController {
 	@PutMapping("/use/cancel")
 	public String cancelUseCoupon(@RequestParam(required = true) String couponCode) {
 		String returnMessage = "";
+		Coupon coupon = new Coupon();
+		coupon.setCouponCode(couponCode);
+		coupon.setUseYn("N");
+		couponService.update(coupon);
 		return returnMessage;
 	}
 
@@ -80,6 +97,10 @@ public class CouponController {
 	 */
 	@GetMapping("expire/list/today")
 	public List<Coupon> expireCouponListToday() {
-		return null;
+		SimpleDateFormat format = new SimpleDateFormat ("yyyy-MM-dd");
+		Date date = new Date();
+		String todayDate = format.format(date);
+		List<Coupon> list = couponService.selectList(null, todayDate, "Y");
+		return list;
 	}
 }
