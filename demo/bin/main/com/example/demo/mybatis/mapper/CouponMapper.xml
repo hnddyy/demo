@@ -1,10 +1,117 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.demo.mapper.CouponMapper">
+<mapper namespace="com.example.demo.mybatis.mapper.CouponMapper">
 	<resultMap id="couponMap" type="coupon">
-		<id column="couponCode" property="userId" javaType="String" />
+		<id column="couponCode" property="couponCode" javaType="String" />
 		<result column="useYn" property="useYn" javaType="String" />
-		<result column="expireYn" property="expireYn" javaType="String" />
+		<result column="giveYn" property="giveYn" javaType="String" />
 		<result column="userId" property="userId" javaType="String" />
+		<result column="makeDate" property="makeDate" javaType="java.util.Date" />
+		<result column="expireDate" property="expireDate" javaType="String" />
+		<result column="expireAlarmYn" property="expireAlarmYn" javaType="String" />
 	</resultMap>
+	
+	<select id="select" resultMap="couponMap">
+		SELECT couponCode
+				,useYn
+				,giveYn
+				,userId
+				,makeDate
+				,expireDate
+				,expireAlarmYn
+		FROM COUPON
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="useYn != null and useYn != ''">
+				AND useYn = #{useYn}
+			</if>
+			<if test="giveYn != null and giveYn != ''">
+				AND giveYn = #{giveYn}
+			</if>
+			AND expireDate > TODAY()
+		</trim>
+		ORDER BY expireDate ASC limit 1
+	</select>
+	
+	<select id="selectList" resultMap="couponMap">
+		SELECT couponCode
+				,useYn
+				,giveYn
+				,userId
+				,makeDate
+				,expireDate
+				,expireAlarmYn
+		FROM COUPON
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="giveYn != null and giveYn != ''">
+				AND giveYn = #{giveYn}
+			</if>
+			<if test="expireDate != null and expireDate != '' and expireYn != null and expireYn != ''">
+				<choose>
+					<when test="'Y'.equals(expireYn)">
+						AND expireDate = #{expireDate}
+					</when>
+					<when test="'N'.equals(expireYn)">
+						AND expireDate > #{expireDate}
+					</when>
+				</choose>
+			</if>
+		</trim>
+		ORDER BY expireDate ASC
+	</select>
+	
+	<insert id="insert" parameterType="coupon">
+		INSERT INTO COUPON (
+			couponCode
+			,useYn
+			,giveYn
+			,makeDate
+			,expireDate
+			,expireAlarmYn
+		) VALUES (
+			#{couponCode}
+			,'N'
+			,'N'
+			,NOW()
+			,TODAY()+10
+			,'N'
+		)
+	</insert>
+	
+	<insert id="insertBatch" parameterType="map">
+		INSERT INTO COUPON (
+			couponCode
+			,useYn
+			,giveYn
+			,makeDate
+			,expireDate
+			,expireAlarmYn ) 
+		VALUES 
+		<foreach item="coupon" index="index" collection="list" open="" separator="," close="">
+		    (#{coupon.couponCode}
+			,'N'
+			,'N'
+			,NOW()
+			,TODAY()+10
+			,'N')
+		</foreach>
+	</insert>
+	
+	<update id="update" parameterType="coupon">
+		UPDATE COUPON
+		SET
+			<if test="useYn != null and useYn !='' ">
+			useYn 			= #{useYn}
+			</if>
+			<if test="giveYn != null and giveYn !='' ">
+			,giveYn 			= #{giveYn}
+			</if>
+			<if test="expireAlarmYn != null and expireAlarmYn !='' ">
+			,expireAlarmYn 	= #{expireAlarmYn}
+			</if>
+			<if test="userId != null and userId !='' ">
+			,userId 			= #{userId}
+			</if>
+		WHERE couponCode 	= #{couponCode}
+	</update>
+	
 </mapper>

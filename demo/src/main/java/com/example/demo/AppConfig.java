@@ -2,6 +2,8 @@ package com.example.demo;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.ibatis.session.SqlSession;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
@@ -17,7 +19,7 @@ import org.springframework.web.client.RestTemplate;
 	    excludeFilters = @Filter(type = FilterType.ANNOTATION, value = Controller.class)
 	)
 public class AppConfig {
-
+	
 	 /**
      * RestTemplate 은 기본적으로 pooling 하지 않으므로 apache client pooling 기능을 사용하여 생성한다.
      * 
